@@ -124,15 +124,16 @@ class ChildBuilder
 
   int? _childCount;
   int? get childCount => _$this._childCount;
-  set childCount(int? childCount) => _$this._childCount = childCount;
+  set childCount(covariant int? childCount) => _$this._childCount = childCount;
 
   int? _parentCount;
   int? get parentCount => _$this._parentCount;
-  set parentCount(int? parentCount) => _$this._parentCount = parentCount;
+  set parentCount(covariant int? parentCount) =>
+      _$this._parentCount = parentCount;
 
   int? _grandparentCount;
   int? get grandparentCount => _$this._grandparentCount;
-  set grandparentCount(int? grandparentCount) =>
+  set grandparentCount(covariant int? grandparentCount) =>
       _$this._grandparentCount = grandparentCount;
 
   ChildBuilder();

@@ -1,3 +1,6 @@
+// fixme Remove when source_gen will be updated to NS
+// @dart = 2.11
+
 import 'dart:async';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
