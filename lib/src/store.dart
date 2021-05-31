@@ -10,13 +10,10 @@ import 'store_change.dart';
 
 /// [Store] is the container of your state. It listens for actions, invokes reducers,
 /// and publishes changes to the state
-class Store<
-    State extends Built<State, StateBuilder>,
-    StateBuilder extends Builder<State, StateBuilder>,
+class Store<State extends Built<State, StateBuilder>, StateBuilder extends Builder<State, StateBuilder>,
     Actions extends ReduxActions> {
   // stream used to dispatch changes to the state
-  final StreamController<StoreChange<State, StateBuilder, dynamic>>
-      _stateController = StreamController.broadcast();
+  final StreamController<StoreChange<State, StateBuilder, dynamic>> _stateController = StreamController.broadcast();
 
   // the current state
   late State _state;
@@ -44,8 +41,7 @@ class Store<
 
       // update the internal state and publish the change
       if (!_stateController.isClosed)
-        _stateController.add(
-            StoreChange<State, StateBuilder, dynamic>(state, _state, action));
+        _stateController.add(StoreChange<State, StateBuilder, dynamic>(state, _state, action));
 
       _state = state;
     };
@@ -56,8 +52,8 @@ class Store<
       Iterable<NextActionHandler> chain = middleware.map((m) => m(api));
 
       // combine each middeware
-      NextActionHandler combinedMiddleware = chain.reduce(
-          (composed, middleware) => (handler) => composed(middleware(handler)));
+      NextActionHandler combinedMiddleware =
+          chain.reduce((composed, middleware) => (handler) => composed(middleware(handler)));
 
       // make the last middleware in the chain call the top-level reducer
       handler = combinedMiddleware(handler);
@@ -76,8 +72,8 @@ class Store<
   /// Useful for undo/redo, testing, and development tools
   void replaceState(State state) {
     if (_state != state) {
-      _stateController.add(StoreChange<State, StateBuilder, dynamic>(
-          state, _state, Action<Null>('replaceState', null)));
+      _stateController
+          .add(StoreChange<State, StateBuilder, dynamic>(state, _state, Action<Null>('replaceState', null)));
       _state = state;
     }
   }
@@ -86,15 +82,13 @@ class Store<
   State get state => _state;
 
   /// [subscribe] returns a stream that will be dispatched whenever the state changes
-  Stream<StoreChange<State, StateBuilder, dynamic>> get stream =>
-      _stateController.stream;
+  Stream<StoreChange<State, StateBuilder, dynamic>> get stream => _stateController.stream;
 
   /// [actions] returns the synced actions
   Actions get actions => _actions;
 
   /// [nextState] is a stream which has a payload of the next state value, rather than the StoreChange event
-  Stream<State> get nextState => stream
-      .map((StoreChange<State, StateBuilder, dynamic> change) => change.next);
+  Stream<State> get nextState => stream.map((StoreChange<State, StateBuilder, dynamic> change) => change.next);
 
   /// [substateStream] returns a stream to the state that is returned by the mapper function.
   /// For example: say my state object had a property count, then store.substateStream((state) => state.count),
@@ -113,19 +107,15 @@ class Store<
   Stream<Substate> nextSubstate<Substate>(
     StateMapper<State, StateBuilder, Substate> mapper,
   ) =>
-      substateStream(mapper)
-          .map((SubstateChange<Substate> change) => change.next);
+      substateStream(mapper).map((SubstateChange<Substate> change) => change.next);
 
   /// [actionStream] returns a stream the fires when a state change is caused by the action
   /// with the name provided. Check out built_redux_rx if you are looking for streams to actions that do not
   /// necessarily result in state changes.
-  Stream<StoreChange<State, StateBuilder, Payload>> actionStream<Payload>(
-          ActionName<Payload> actionName) =>
-      stream
-          .where((c) => c.action.name == actionName.name)
-          .map((c) => StoreChange<State, StateBuilder, Payload>(
-                c.next,
-                c.prev,
-                c.action as Action<Payload>,
-              ));
+  Stream<StoreChange<State, StateBuilder, Payload>> actionStream<Payload>(ActionName<Payload> actionName) =>
+      stream.where((c) => c.action.name == actionName.name).map((c) => StoreChange<State, StateBuilder, Payload>(
+            c.next,
+            c.prev,
+            c.action as Action<Payload>,
+          ));
 }
