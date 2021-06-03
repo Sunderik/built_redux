@@ -6,7 +6,8 @@ import 'action.dart';
 import 'store.dart';
 
 /// [StoreChange] is the payload for the [Store] subscription
-class StoreChange<State extends Built<State, StateBuilder>, StateBuilder extends Builder<State, StateBuilder>, P> {
+class StoreChange<State extends Built<State, StateBuilder>,
+    StateBuilder extends Builder<State, StateBuilder>, P> {
   final State next;
   final State prev;
   final Action<P> action;
@@ -28,13 +29,17 @@ typedef StoreChangeHandler<P, State extends Built<State, StateBuilder>,
 /// set of actions with many different payload types, while maintaining type safety.
 /// Each [StoreChangeHandler] added with add<T> must take a [StoreChange] with prev and next of type
 /// <State, StateBuilder> an Action of typ Action<T>,
-class StoreChangeHandlerBuilder<State extends Built<State, StateBuilder>,
-    StateBuilder extends Builder<State, StateBuilder>, Actions extends ReduxActions> {
+class StoreChangeHandlerBuilder<
+    State extends Built<State, StateBuilder>,
+    StateBuilder extends Builder<State, StateBuilder>,
+    Actions extends ReduxActions> {
   final _map = Map<String, StoreChangeHandler<dynamic, State, StateBuilder>>();
-  late StreamSubscription<StoreChange<State, StateBuilder, dynamic>> _subscription;
+  late StreamSubscription<StoreChange<State, StateBuilder, dynamic>>
+      _subscription;
 
   /// Registers [handler] function to the given [actionName]
-  void add<Payload>(ActionName<Payload> actionName, StoreChangeHandler<Payload, State, StateBuilder> handler) {
+  void add<Payload>(ActionName<Payload> actionName,
+      StoreChangeHandler<Payload, State, StateBuilder> handler) {
     _map[actionName.name] = (change) {
       handler(StoreChange<State, StateBuilder, Payload>(
         change.next,
@@ -46,7 +51,8 @@ class StoreChangeHandlerBuilder<State extends Built<State, StateBuilder>,
 
   /// [build] sets up a subscription to the registered actions
   void build(Store<State, StateBuilder, Actions> store) {
-    _subscription = store.stream.listen((StoreChange<State, StateBuilder, dynamic> storeChange) {
+    _subscription = store.stream
+        .listen((StoreChange<State, StateBuilder, dynamic> storeChange) {
       var handler = _map[storeChange.action.name];
       if (handler != null) handler(storeChange);
     });
