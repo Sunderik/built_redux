@@ -8,15 +8,13 @@ import 'typedefs.dart';
 /// Each [Reducer] added with add<T> must take a state of type State, an Action of type
 /// Action<T>, and a builder of type B.
 /// Nested reducers can be added with [combineNested]
-class ReducerBuilder<State extends Built<State, StateBuilder>,
-    StateBuilder extends Builder<State, StateBuilder>> {
+class ReducerBuilder<State extends Built<State, StateBuilder>, StateBuilder extends Builder<State, StateBuilder>> {
   final _map = Map<String, Reducer<State, StateBuilder, dynamic>>();
 
   ReducerBuilder();
 
   /// Registers [reducer] function to the given [actionName]
-  void add<Payload>(ActionName<Payload> actionName,
-      Reducer<State, StateBuilder, Payload> reducer) {
+  void add<Payload>(ActionName<Payload> actionName, Reducer<State, StateBuilder, Payload> reducer) {
     _map[actionName.name] = (state, action, builder) {
       reducer(state, action as Action<Payload>, builder);
     };
@@ -38,8 +36,7 @@ class ReducerBuilder<State extends Built<State, StateBuilder>,
   /// [combineAbstract] combines this ReducerBuilder with an AbstractReducerBuilder.
   /// This function takes the result of AbstractReducerBuilder's .build() function,
   /// which is a map. It does not take an AbstractReducerBuilder directly.
-  void combineAbstract(
-      Map<String, Reducer<State, StateBuilder, dynamic>> other) {
+  void combineAbstract(Map<String, Reducer<State, StateBuilder, dynamic>> other) {
     _map.addAll(other);
   }
 
@@ -49,8 +46,7 @@ class ReducerBuilder<State extends Built<State, StateBuilder>,
   }
 
   /// [combineListMultimap] combines this ReducerBuilder with a ListMultimapReducerBuilder
-  void combineListMultimap<K, V>(
-      ListMultimapReducerBuilder<State, StateBuilder, K, V> other) {
+  void combineListMultimap<K, V>(ListMultimapReducerBuilder<State, StateBuilder, K, V> other) {
     _map.addAll(other._map);
   }
 
@@ -65,14 +61,12 @@ class ReducerBuilder<State extends Built<State, StateBuilder>,
   }
 
   /// [combineSetMultimap] combines this ReducerBuilder with a SetMultimapReducerBuilder
-  void combineSetMultimap<K, V>(
-      SetMultimapReducerBuilder<State, StateBuilder, K, V> other) {
+  void combineSetMultimap<K, V>(SetMultimapReducerBuilder<State, StateBuilder, K, V> other) {
     _map.addAll(other._map);
   }
 
   /// [build] returns a reducer function that can be passed to a [Store].
-  Reducer<State, StateBuilder, dynamic> build() =>
-      (State state, Action<dynamic> action, StateBuilder builder) {
+  Reducer<State, StateBuilder, dynamic> build() => (State state, Action<dynamic> action, StateBuilder builder) {
         final reducer = _map[action.name];
         if (reducer != null) reducer(state, action, builder);
       };
@@ -126,8 +120,7 @@ class NestedReducerBuilder<
   NestedReducerBuilder(this._stateMapper, this._builderMapper);
 
   /// Registers [reducer] function to the given [actionName]
-  void add<Payload>(ActionName<Payload> actionName,
-      Reducer<NestedState, NestedStateBuilder, Payload> reducer) {
+  void add<Payload>(ActionName<Payload> actionName, Reducer<NestedState, NestedStateBuilder, Payload> reducer) {
     _map[actionName.name] = (state, action, builder) => reducer(
           _stateMapper(state),
           action as Action<Payload>,
@@ -137,8 +130,7 @@ class NestedReducerBuilder<
 
   /// [combineReducerBuilder] takes a `ReducerBuilder` with the type arguments
   /// `NestedState`, `NestedStateBuilder`, and combines it with this `NestedReducerBuilder`.
-  void combineReducerBuilder(
-      ReducerBuilder<NestedState, NestedStateBuilder> other) {
+  void combineReducerBuilder(ReducerBuilder<NestedState, NestedStateBuilder> other) {
     final adapted = other._map.map((name, reducer) => MapEntry(
         name,
         (State state, Action<dynamic> action, StateBuilder builder) => reducer(
@@ -159,8 +151,7 @@ class AbstractReducerBuilder<AState, AStateBuilder> {
   final _map = Map<String, CReducer<AState, AStateBuilder, dynamic>>();
 
   /// Registers [reducer] function to the given [actionName]
-  void add<Payload>(ActionName<Payload> actionName,
-      CReducer<AState, AStateBuilder, Payload> reducer) {
+  void add<Payload>(ActionName<Payload> actionName, CReducer<AState, AStateBuilder, Payload> reducer) {
     _map[actionName.name] = (state, action, builder) {
       reducer(state, action as Action<Payload>, builder);
     };
@@ -172,13 +163,12 @@ class AbstractReducerBuilder<AState, AStateBuilder> {
 /// This is the Reducer typedef without the Built/Builder constraints
 /// Used for built_collections since they do not implement Built/Builder
 /// but follow the same pattern.
-typedef CReducer<AState, AStateBuilder, P> = void Function(
-    AState state, Action<P> action, AStateBuilder builder);
+typedef CReducer<AState, AStateBuilder, P> = void Function(AState state, Action<P> action, AStateBuilder builder);
 
 /// [ListReducerBuilder] returns a reducer builder that
 /// rebuilds a List nested within the state tree
-class ListReducerBuilder<State extends Built<State, StateBuilder>,
-    StateBuilder extends Builder<State, StateBuilder>, T> {
+class ListReducerBuilder<State extends Built<State, StateBuilder>, StateBuilder extends Builder<State, StateBuilder>,
+    T> {
   final _map = Map<String, Reducer<State, StateBuilder, dynamic>>();
   Mapper<State, BuiltList<T>> _stateMapper;
   Mapper<StateBuilder, ListBuilder<T>> _builderMapper;
@@ -186,8 +176,7 @@ class ListReducerBuilder<State extends Built<State, StateBuilder>,
   ListReducerBuilder(this._stateMapper, this._builderMapper);
 
   /// Registers [reducer] function to the given [actionName]
-  void add<Payload>(ActionName<Payload> actionName,
-      CReducer<BuiltList<T>, ListBuilder<T>, Payload> reducer) {
+  void add<Payload>(ActionName<Payload> actionName, CReducer<BuiltList<T>, ListBuilder<T>, Payload> reducer) {
     _map[actionName.name] = (state, action, builder) => reducer(
           _stateMapper(state),
           action as Action<Payload>,
@@ -208,9 +197,7 @@ class ListMultimapReducerBuilder<State extends Built<State, StateBuilder>,
 
   /// Registers [reducer] function to the given [actionName]
   void add<Payload>(
-      ActionName<Payload> actionName,
-      CReducer<BuiltListMultimap<K, V>, ListMultimapBuilder<K, V>, Payload>
-          reducer) {
+      ActionName<Payload> actionName, CReducer<BuiltListMultimap<K, V>, ListMultimapBuilder<K, V>, Payload> reducer) {
     _map[actionName.name] = (state, action, builder) => reducer(
           _stateMapper(state),
           action as Action<Payload>,
@@ -221,8 +208,8 @@ class ListMultimapReducerBuilder<State extends Built<State, StateBuilder>,
 
 /// [MapReducerBuilder] returns a reducer builder that
 /// rebuilds a Map nested within the state tree
-class MapReducerBuilder<State extends Built<State, StateBuilder>,
-    StateBuilder extends Builder<State, StateBuilder>, K, V> {
+class MapReducerBuilder<State extends Built<State, StateBuilder>, StateBuilder extends Builder<State, StateBuilder>, K,
+    V> {
   final _map = Map<String, Reducer<State, StateBuilder, dynamic>>();
   Mapper<State, BuiltMap<K, V>> _stateMapper;
   Mapper<StateBuilder, MapBuilder<K, V>> _builderMapper;
@@ -230,8 +217,7 @@ class MapReducerBuilder<State extends Built<State, StateBuilder>,
   MapReducerBuilder(this._stateMapper, this._builderMapper);
 
   /// Registers [reducer] function to the given [actionName]
-  void add<Payload>(ActionName<Payload> actionName,
-      CReducer<BuiltMap<K, V>, MapBuilder<K, V>, Payload> reducer) {
+  void add<Payload>(ActionName<Payload> actionName, CReducer<BuiltMap<K, V>, MapBuilder<K, V>, Payload> reducer) {
     _map[actionName.name] = (state, action, builder) => reducer(
           _stateMapper(state),
           action as Action<Payload>,
@@ -242,8 +228,8 @@ class MapReducerBuilder<State extends Built<State, StateBuilder>,
 
 /// [SetReducerBuilder] returns a reducer builder that
 /// rebuilds a Set nested within the state tree
-class SetReducerBuilder<State extends Built<State, StateBuilder>,
-    StateBuilder extends Builder<State, StateBuilder>, T> {
+class SetReducerBuilder<State extends Built<State, StateBuilder>, StateBuilder extends Builder<State, StateBuilder>,
+    T> {
   final _map = Map<String, Reducer<State, StateBuilder, dynamic>>();
   Mapper<State, BuiltSet<T>> _stateMapper;
   Mapper<StateBuilder, SetBuilder<T>> _builderMapper;
@@ -251,8 +237,7 @@ class SetReducerBuilder<State extends Built<State, StateBuilder>,
   SetReducerBuilder(this._stateMapper, this._builderMapper);
 
   /// Registers [reducer] function to the given [actionName]
-  void add<Payload>(ActionName<Payload> actionName,
-      CReducer<BuiltSet<T>, SetBuilder<T>, Payload> reducer) {
+  void add<Payload>(ActionName<Payload> actionName, CReducer<BuiltSet<T>, SetBuilder<T>, Payload> reducer) {
     _map[actionName.name] = (state, action, builder) => reducer(
           _stateMapper(state),
           action as Action<Payload>,
@@ -273,9 +258,7 @@ class SetMultimapReducerBuilder<State extends Built<State, StateBuilder>,
 
   /// Registers [reducer] function to the given [actionName]
   void add<Payload>(
-      ActionName<Payload> actionName,
-      CReducer<BuiltSetMultimap<K, V>, SetMultimapBuilder<K, V>, Payload>
-          reducer) {
+      ActionName<Payload> actionName, CReducer<BuiltSetMultimap<K, V>, SetMultimapBuilder<K, V>, Payload> reducer) {
     _map[actionName.name] = (state, action, builder) => reducer(
           _stateMapper(state),
           action as Action<Payload>,
